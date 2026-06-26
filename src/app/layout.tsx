@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import { CartProvider } from '@/contexts/CartContext'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ToastProvider } from '@/contexts/ToastContext'
+import Navbar from '@/components/Navbar'
+import CartSidebar from '@/components/CartSidebar'
 
 export const metadata: Metadata = {
   title: 'StudentCraft — Student Marketplace',
@@ -20,6 +22,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ThemeProvider>
               <CartProvider>
                 <ToastProvider>
+                  <Navbar />
+                  <CartSidebar />
                   {children}
                 </ToastProvider>
               </CartProvider>
