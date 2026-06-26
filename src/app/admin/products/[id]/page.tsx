@@ -30,7 +30,7 @@ export default function AdminProductDetailPage() {
     if (profile?.role !== 'admin') return
     const supabase = createClient()
     supabase.from('products').select('*, profiles(*)').eq('id', productId).single()
-      .then(({ data }) => setProduct(data))
+      .then(function({ data }) { setProduct(data) })
   }, [profile, productId])
 
   if (authLoading || !profile || profile.role !== 'admin' || !product) return (
@@ -42,7 +42,7 @@ export default function AdminProductDetailPage() {
   async function handleApprove() {
     const supabase = createClient()
     await supabase.from('products').update({ is_approved: true }).eq('id', productId)
-    setProduct(prev => prev ? { ...prev, is_approved: true } : null)
+    setProduct(function(prev) { return prev ? Object.assign({}, prev, { is_approved: true }) : null })
     show(t('admin_product_approved_msg'), 'success')
   }
 
@@ -53,8 +53,11 @@ export default function AdminProductDetailPage() {
     router.push('/admin/products')
   }
 
-  const name = productName(product)
-  const desc = productDesc(product)
+  var name = productName(product)
+  var desc = productDesc(product)
+  var initials = product.profiles?.full_name
+    ? product.profiles.full_name.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2)
+    : '??'
 
   return (
     <>
@@ -76,8 +79,8 @@ export default function AdminProductDetailPage() {
             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`badge badge-${product.category}`}>{catLabel(product.category)}</span>
-                  <span className={`badge ${product.is_approved ? 'badge-free' : 'bg-yellow-500/15 text-yellow-400'}`}>
+                  <span className={'badge badge-' + product.category}>{catLabel(product.category)}</span>
+                  <span className={'badge ' + (product.is_approved ? 'badge-free' : 'bg-yellow-500/15 text-yellow-400')}>
                     {product.is_approved ? 'Approved' : 'Pending Review'}
                   </span>
                 </div>
@@ -86,35 +89,35 @@ export default function AdminProductDetailPage() {
                   <p className="text-sm" style={{color:'var(--fg-s)'}}>{product.name_en}</p>
                 )}
               </div>
-              <span className={`price-t text-3xl ${product.price===0?'free':''}`}>
-                {product.price === 0 ? t('free_text') : `$${product.price}`}
+              <span className={'price-t text-3xl ' + (product.price === 0 ? 'free' : '')}>
+                {product.price === 0 ? t('free_text') : '$' + product.price}
               </span>
             </div>
 
-            <p className="urdu text-lg leading-loose mb-6" style={{color:'var(--fg-m)'}}>{desc}</p>
+            <p className="urdu text-lg leading-loose mb-4" style={{color:'var(--fg-m)'}}>{desc}</p>
             {product.description_en && (
               <p className="text-base leading-relaxed mb-6" style={{color:'var(--fg-m)'}}>{product.description_en}</p>
             )}
 
             <div className="flex flex-wrap gap-2 mb-6">
-              {product.tags.map(tag => (
-                <span key={tag} className="rounded-lg px-3 py-1 text-xs" style={{background:'var(--bg)',border:'1px solid var(--border)',color:'var(--fg-m)'}}>#{tag}</span>
-              ))}
+              {product.tags.map(function(tag) {
+                return (
+                  <span key={tag} className="rounded-lg px-3 py-1 text-xs" style={{background:'var(--bg)',border:'1px solid var(--border)',color:'var(--fg-m)'}}>
+                    #{tag}
+                  </span>
+                )
+              })}
             </div>
 
-            {/* سیلر کی معلومات */}
             <div className="rounded-xl p-4 mb-6 flex items-center gap-4" style={{background:'var(--bg)',border:'1px solid var(--border)'}}>
-              <div className="seller-av w-11 h-11 text-sm">
-                {product.profiles?.full_name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) || '??'}
-              </div>
+              <div className="seller-av w-11 h-11 text-sm">{initials}</div>
               <div className="flex-1">
                 <div className="font-semibold">{product.profiles?.full_name || '—'}</div>
                 <div className="text-sm urdu" style={{color:'var(--fg-s)'}}>{product.profiles?.university || ''}</div>
               </div>
-              <Link href={`/admin/students/${product.seller_id}`} className="btn-o btn-sm text-xs">View Seller</Link>
+              <Link href={'/admin/students/' + product.seller_id} className="btn-o btn-sm text-xs">View Seller</Link>
             </div>
 
-            {/* لنکس */}
             <div className="rounded-xl p-4 mb-6" style={{background:'var(--bg)',border:'1px solid var(--border)'}}>
               <div className="text-sm font-medium mb-2" style={{color:'var(--fg-m)'}}>Download URL:</div>
               <a href={product.download_url} target="_blank" rel="noopener" className="text-amber-400 text-sm hover:underline break-all">
@@ -122,14 +125,16 @@ export default function AdminProductDetailPage() {
               </a>
             </div>
 
-            {/* ایکشن بٹنز */}
             {!product.is_approved && (
               <div className="flex gap-3">
                 <button onClick={handleApprove} className="btn-p flex-1 py-3 text-base flex items-center justify-center gap-2">
                   <i className="fas fa-check-circle"></i> {t('admin_product_approve')}
                 </button>
-                <button onClick={handleReject} className="flex-1 py-3 rounded-xl font-semibold text-red-400 border border-red-400/30 hover:bg-red-400/10 transition-colors bg-transparent cursor-pointer text-base flex items-center justify-center gap-2"
-                  style={{fontFamily:'inherit'}}>
+                <button
+                  onClick={handleReject}
+                  className="flex-1 py-3 rounded-xl font-semibold text-red-400 border border-red-400/30 hover:bg-red-400/10 transition-colors bg-transparent cursor-pointer text-base flex items-center justify-center gap-2"
+                  style={{fontFamily:'inherit'}}
+                >
                   <i className="fas fa-times-circle"></i> {t('admin_product_reject')}
                 </button>
               </div>
