@@ -51,7 +51,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 pt-6 text-center text-sm" style={{borderTop:'1px solid var(--border)',color:'var(--fg-s)'}}>
-          2025 StudentCraft — {t('footer_rights')}
+          2026 ToolsMarketPlace — {t('footer_rights')}
         </div>
       </div>
     </footer>
