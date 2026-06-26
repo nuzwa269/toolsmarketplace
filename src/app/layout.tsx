@@ -9,7 +9,7 @@ import Navbar from '@/components/Navbar'
 import CartSidebar from '@/components/CartSidebar'
 
 export const metadata: Metadata = {
-  title: 'StudentCraft — Student Marketplace',
+  title: 'toolsmarketplace — Student Hub',
   description: 'Sell your extensions, apps, tools and websites. Built by students, for students.'
 }
 
