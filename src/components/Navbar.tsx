@@ -36,7 +36,7 @@ export default function Navbar() {
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center">
             <i className="fas fa-cube text-black text-sm"></i>
           </div>
-          <span className="font-bold text-lg tracking-tight hidden sm:block">StudentCraft</span>
+          <span className="font-bold text-lg tracking-tight hidden sm:block">toolsmarketplace</span>
         </Link>
 
         <form onSubmit={handleSearch} className="flex-1 max-w-xl relative">
