@@ -59,18 +59,33 @@ export default function AdminPage() {
     { icon: 'fas fa-times-circle', label: t('admin_rejected'), value: rejectedCount, color: 'text-red-400' },
     { icon: 'fas fa-box', label: t('admin_total_products'), value: products.length, color: 'text-indigo-400' },
     { icon: 'fas fa-exclamation-triangle', label: t('admin_unapproved_products'), value: unapprovedProducts, color: 'text-orange-400' },
-    { icon: 'fas fa-dollar-sign', label: t('admin_total_revenue'), value: `$${totalRevenue}`, color: 'text-pink-400' },
+    { icon: 'fas fa-dollar-sign', label: t('admin_total_revenue'), value: '$' + totalRevenue, color: 'text-pink-400' },
     { icon: 'fas fa-shopping-bag', label: 'Total Orders', value: orders.length, color: 'text-cyan-400' },
   ]
 
   const recentStudents = students.slice(0, 5)
   const recentProducts = products.filter(p => !p.is_approved).slice(0, 5)
 
+  function getStudentStatus(s: Profile): string {
+    if (s.is_approved_seller) return 'approved'
+    if (s.is_rejected) return 'rejected'
+    return 'pending'
+  }
+
+  function StatusBadge({ status }: { status: string }) {
+    const map: Record<string, { color: string; key: string }> = {
+      approved: { color: 'bg-emerald-500/15 text-emerald-400', key: 'admin_status_approved' },
+      rejected: { color: 'bg-red-500/15 text-red-400', key: 'admin_status_rejected' },
+      pending: { color: 'bg-yellow-500/15 text-yellow-400', key: 'admin_status_pending' },
+    }
+    const info = map[status] || { color: 'bg-stone-500/15 text-stone-400', key: 'admin_status_normal' }
+    return <span className={'badge ' + info.color}>{t(info.key)}</span>
+  }
+
   return (
     <>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-24">
-        {/* ہیڈر */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
             <i className="fas fa-shield-alt text-white text-xl"></i>
@@ -81,18 +96,16 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <!-- اعداد و شمار -->
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
           {stats.map((s, i) => (
             <div key={i} className="rounded-2xl p-5" style={{background:'var(--card)',border:'1px solid var(--border)'}}>
-              <i className={`${s.icon} text-lg mb-2 ${s.color}`}></i>
+              <i className={s.icon + ' text-lg mb-2 ' + s.color}></i>
               <div className="text-2xl font-bold">{s.value}</div>
               <div className="text-sm mt-1" style={{color:'var(--fg-s)'}}>{s.label}</div>
             </div>
           ))}
         </div>
 
-        <!-- نیویگیشن کارڈز -->
         <div className="grid sm:grid-cols-2 gap-6 mb-10">
           <Link href="/admin/students" className="rounded-2xl p-6 flex items-center gap-4 transition-all hover:scale-[1.02]" style={{background:'var(--card)',border:'1px solid var(--border)'}}>
             <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center">
@@ -117,7 +130,6 @@ export default function AdminPage() {
           </Link>
         </div>
 
-        <!-- حالیہ سٹوڈنٹس -->
         <div className="rounded-2xl p-6 mb-6" style={{background:'var(--card)',border:'1px solid var(--border)'}}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">{t('admin_students')} (Recent)</h3>
@@ -128,22 +140,21 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-3">
               {recentStudents.map(s => (
-                <Link key={s.id} href={`/admin/students/${s.id}`} className="flex items-center gap-4 p-3 rounded-xl transition-colors hover:opacity-80" style={{background:'var(--bg)'}}>
+                <Link key={s.id} href={'/admin/students/' + s.id} className="flex items-center gap-4 p-3 rounded-xl transition-colors hover:opacity-80" style={{background:'var(--bg)'}}>
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center text-black font-bold text-sm">
-                    {s.full_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) || '??'}
+                    {s.full_name ? s.full_name.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2) : '??'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate">{s.full_name || '—'}</div>
                     <div className="text-xs truncate" style={{color:'var(--fg-s)'}}>{s.university || '—'}</div>
                   </div>
-                  <StatusBadge status={getStudentStatus(s)} t={t} />
+                  <StatusBadge status={getStudentStatus(s)} />
                 </Link>
               ))}
             </div>
           )}
         </div>
 
-        <!-- غیر تصدیق شدہ پروڈکٹس -->
         {recentProducts.length > 0 && (
           <div className="rounded-2xl p-6" style={{background:'var(--card)',border:'1px solid var(--border)'}}>
             <div className="flex items-center justify-between mb-4">
@@ -158,7 +169,7 @@ export default function AdminPage() {
                     <div className="font-medium text-sm truncate">{p.name}</div>
                     <div className="text-xs" style={{color:'var(--fg-s)'}}>{p.category} · ${p.price}</div>
                   </div>
-                  <Link href={`/admin/products/${p.id}`} className="btn-o btn-sm">Review</Link>
+                  <Link href={'/admin/products/' + p.id} className="btn-o btn-sm">Review</Link>
                 </div>
               ))}
             </div>
@@ -168,20 +179,4 @@ export default function AdminPage() {
       <Footer />
     </>
   )
-}
-
-function getStudentStatus(s: Profile): string {
-  if (s.is_approved_seller) return 'approved'
-  if (s.is_rejected) return 'rejected'
-  return 'pending'
-}
-
-function StatusBadge({ status, t }: { status: string; t: (k: string) => string }) {
-  const map: Record<string, { color: string; key: string }> = {
-    approved: { color: 'bg-emerald-500/15 text-emerald-400', key: 'admin_status_approved' },
-    rejected: { color: 'bg-red-500/15 text-red-400', key: 'admin_status_rejected' },
-    pending: { color: 'bg-yellow-500/15 text-yellow-400', key: 'admin_status_pending' },
-  }
-  const info = map[status] || { color: 'bg-stone-500/15 text-stone-400', key: 'admin_status_normal' }
-  return <span className={`badge ${info.color}`}>{t(info.key)}</span>
 }
