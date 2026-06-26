@@ -3,7 +3,14 @@ export interface Profile {
   full_name: string | null
   university: string | null
   avatar_url: string | null
-  is_verified: boolean
+  phone: string | null
+  bank_account: string | null
+  skills: string[]
+  bio: string | null
+  role: 'admin' | 'user'
+  is_approved_seller: boolean
+  is_rejected: boolean
+  reject_reason: string | null
   created_at: string
 }
 
@@ -56,6 +63,15 @@ export interface OrderItem {
   price: number
   download_url: string | null
   created_at: string
+}
+
+export interface AdminNote {
+  id: string
+  admin_id: string
+  student_id: string
+  note: string
+  created_at: string
+  profiles?: Profile
 }
 
 export interface CartItem {
