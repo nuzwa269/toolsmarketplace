@@ -83,8 +83,8 @@ export default function Navbar() {
               <Link href="/auth/signup" className="btn-p btn-sm">{t('nav_signup')}</Link>
             </>
           ) : null}
-
-          <button onClick={() => { /* کارٹ سائیڈبار کھولیں - آگے کے کمپوننٹ میں */ }}
+          
+<button onClick={() => document.querySelector('.cart-side')?.classList.toggle('open'); document.querySelector('.cart-over')?.classList.toggle('open')}
             className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors"
             style={{background:'var(--card)',border:'1px solid var(--border)'}}>
             <i className="fas fa-shopping-cart text-sm" style={{color:'var(--fg-m)'}}></i>
