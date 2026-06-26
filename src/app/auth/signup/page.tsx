@@ -12,10 +12,15 @@ export default function SignupPage() {
   const { t } = useLang()
   const { show } = useToast()
   const router = useRouter()
-  const [form, setForm] = useState({ name: '', email: '', password: '', university: '' })
+  const [form, setForm] = useState({
+    name: '', email: '', password: '', university: '',
+    phone: '', bank_account: '', skills: '', bio: ''
+  })
   const [loading, setLoading] = useState(false)
 
-  function update(k: string, v: string) { setForm(prev => ({ ...prev, [k]: v })) }
+  function update(k: string, v: string) {
+    setForm(prev => ({ ...prev, [k]: v }))
+  }
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -29,10 +34,17 @@ export default function SignupPage() {
       })
       if (error) throw error
 
-      // پروفائل اپڈیٹ (یونیورسٹی)
-      if (form.university) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) await supabase.from('profiles').update({ university: form.university }).eq('id', user.id)
+      // پروفائل اپڈیٹ — نئے فیلڈز
+      const { data: { user: newUser } } = await supabase.auth.getUser()
+      if (newUser) {
+        const skills = form.skills ? form.skills.split(',').map(s => s.trim()).filter(Boolean) : []
+        await supabase.from('profiles').update({
+          university: form.university || null,
+          phone: form.phone || null,
+          bank_account: form.bank_account || null,
+          skills,
+          bio: form.bio || null
+        }).eq('id', newUser.id)
       }
 
       show('Account created!', 'success')
@@ -44,35 +56,57 @@ export default function SignupPage() {
     }
   }
 
+  const inputStyle = { width: '100%' }
+
   return (
     <>
       <Navbar />
       <div className="max-w-md mx-auto px-4 py-32">
         <div className="rounded-2xl p-8" style={{background:'var(--card)',border:'1px solid var(--border)'}}>
           <h1 className="text-2xl font-bold mb-6 urdu text-center">{t('signup_title')}</h1>
+
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
               <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('signup_name')}</label>
-              <input className="inp" required value={form.name} onChange={e => update('name', e.target.value)} />
+              <input className="inp" style={inputStyle} required value={form.name} onChange={e => update('name', e.target.value)} />
             </div>
             <div>
               <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('signup_university')}</label>
-              <input className="inp" value={form.university} onChange={e => update('university', e.target.value)} placeholder="FAST NUCES" />
+              <input className="inp" style={inputStyle} value={form.university} onChange={e => update('university', e.target.value)} placeholder="FAST NUCES" />
             </div>
             <div>
               <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('login_email')}</label>
-              <input type="email" className="inp" required value={form.email} onChange={e => update('email', e.target.value)} />
+              <input type="email" className="inp" style={inputStyle} required value={form.email} onChange={e => update('email', e.target.value)} />
             </div>
             <div>
               <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('login_password')}</label>
-              <input type="password" className="inp" required minLength={6} value={form.password} onChange={e => update('password', e.target.value)} />
+              <input type="password" className="inp" style={inputStyle} required minLength={6} value={form.password} onChange={e => update('password', e.target.value)} />
             </div>
+            <div>
+              <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('admin_phone')}</label>
+              <input className="inp" style={inputStyle} value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="03XX-XXXXXXX" />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('admin_bank')}</label>
+              <input className="inp" style={inputStyle} value={form.bank_account} onChange={e => update('bank_account', e.target.value)} placeholder="IBAN or Account Number" />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('admin_skills')}</label>
+              <input className="inp" style={inputStyle} value={form.skills} onChange={e => update('skills', e.target.value)} placeholder="React, Python, Figma" />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 urdu" style={{color:'var(--fg-m)'}}>{t('admin_bio')}</label>
+              <textarea className="inp" style={inputStyle} rows={3} value={form.bio} onChange={e => update('bio', e.target.value)} placeholder="Tell us about yourself..."></textarea>
+            </div>
+
             <button type="submit" disabled={loading} className="btn-p w-full py-3 disabled:opacity-50">
               {loading ? '...' : t('signup_btn')}
             </button>
           </form>
+
           <p className="text-sm text-center mt-6 urdu" style={{color:'var(--fg-m)'}}>
-            {t('signup_has_account')} <Link href="/auth/login" className="text-amber-400 font-semibold hover:underline">{t('nav_login')}</Link>
+            {t('signup_has_account')}{' '}
+            <Link href="/auth/login" className="text-amber-400 font-semibold hover:underline">{t('nav_login')}</Link>
           </p>
         </div>
       </div>
