@@ -21,7 +21,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center">
                 <i className="fas fa-cube text-black text-xs"></i>
               </div>
-              <span className="font-bold">StudentCraft</span>
+              <span className="font-bold">ToolsMarketPlace</span>
             </div>
             <p className="text-sm urdu" style={{color:'var(--fg-s)'}}>{t('footer_desc')}</p>
           </div>
